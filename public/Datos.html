@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile Data</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="styles/estilos.css" />
+  </head>
+  <body>
+    <h1>Skate Park</h1>
+    <div class="py-4">
+      <h2>Profile Data</h2>
+      <hr class="w-50" />
+      <form id="profile-form">
+        <div class="form-group row w-50 m-auto">
+          <div class="form-group col-12 col-sm-6">
+            <label>Email</label>
+            <input
+              type="email"
+              class="form-control m-auto"
+              id="email"
+              disabled
+            />
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <label>Name</label>
+            <input type="text" class="form-control m-auto" id="nombre" />
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <label>Password</label>
+            <input type="password" class="form-control m-auto" id="password" />
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <label>Repeat Password</label>
+            <input
+              type="password"
+              class="form-control m-auto"
+              id="repeat-password"
+            />
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <label>Years of Experience</label>
+            <input
+              type="number"
+              class="form-control m-auto"
+              id="anos_experiencia"
+            />
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <label>Specialty</label>
+            <input type="text" class="form-control m-auto" id="especialidad" />
+          </div>
+        </div>
+        <div class="mb-1">
+          <button type="submit" class="btn btn-primary">Update</button>
+        </div>
+        <div>
+          <button type="button" id="delete-account" class="btn btn-danger">
+            Delete Account
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", async () => {
+        const token = sessionStorage.getItem("token");
+        if (!token) {
+          window.location.href = "Login.html";
+        }
+
+        const response = await fetch("/api/profile", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          const profile = await response.json();
+          document.getElementById("email").value = profile.email;
+          document.getElementById("nombre").value = profile.nombre;
+          document.getElementById("anos_experiencia").value =
+            profile.anos_experiencia;
+          document.getElementById("especialidad").value = profile.especialidad;
+        } else {
+          alert("Failed to load profile data.");
+          sessionStorage.removeItem("token");
+          window.location.href = "Login.html";
+        }
+      });
+
+      document
+        .getElementById("profile-form")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const token = sessionStorage.getItem("token");
+
+          const profileData = {
+            nombre: document.getElementById("nombre").value,
+            password: document.getElementById("password").value,
+            anos_experiencia: document.getElementById("anos_experiencia").value,
+            especialidad: document.getElementById("especialidad").value,
+          };
+
+          const response = await fetch("/api/profile", {
+            method: "PUT",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(profileData),
+          });
+
+          if (response.ok) {
+            alert("Profile updated successfully.");
+          } else {
+            alert("Failed to update profile.");
+          }
+        });
+
+      document
+        .getElementById("delete-account")
+        .addEventListener("click", async () => {
+          const token = sessionStorage.getItem("token");
+
+          const response = await fetch("/api/profile", {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            sessionStorage.removeItem("token");
+            window.location.href = data.redirectUrl;
+          } else {
+            alert("Failed to delete account.");
+          }
+        });
+    </script>
+  </body>
+</html>

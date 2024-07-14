@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="/styles/estilos.css" />
+    <style>
+      .photo {
+        width: 50px;
+        height: 50px;
+        background-size: cover;
+        background-position: center;
+      }
+      .message {
+        margin: 10px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Skate Park</h1>
+    <div class="py-4">
+      <h2>Administration</h2>
+      <hr class="w-50" />
+      <div id="message" class="alert alert-info message" role="alert" style="display: none;"></div>
+      <table class="table table-dark w-50 m-auto">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Photo</th>
+            <th scope="col">Name</th>
+            <th scope="col">Years of Experience</th>
+            <th scope="col">Specialty</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody id="admin-list">
+          {{#each skaters}}
+          <tr>
+            <th scope="row">{{@index}}</th>
+            <td><div class="photo" style="background-image: url('{{foto}}');"></div></td>
+            <td>{{nombre}}</td>
+            <td>{{anos_experiencia}}</td>
+            <td>{{especialidad}}</td>
+            <td>
+              <input type="checkbox" {{#if estado}}checked{{/if}} data-id="{{id}}" data-nombre="{{nombre}}">
+            </td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const adminList = document.getElementById("admin-list");
+        const messageBox = document.getElementById("message");
+
+        adminList.addEventListener("change", async (event) => {
+          if (event.target.type === "checkbox") {
+            const id = event.target.getAttribute("data-id");
+            const nombre = event.target.getAttribute("data-nombre");
+            const estado = event.target.checked;
+
+            try {
+              const response = await fetch(`/api/skaters/${id}/status`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ estado }),
+              });
+
+              if (response.ok) {
+                messageBox.textContent = `Skater ${nombre}'s status changed`;
+                messageBox.style.display = "block";
+                setTimeout(() => {
+                  messageBox.style.display = "none";
+                }, 3000);
+              } else {
+                throw new Error("Failed to update status");
+              }
+            } catch (error) {
+              console.error("Failed to update status:", error);
+            }
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

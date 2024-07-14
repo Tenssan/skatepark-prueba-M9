@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="styles/estilos.css" />
+  </head>
+  <body>
+    <h1>Skate Park</h1>
+    <div class="py-4">
+      <h2>Register</h2>
+      <hr class="w-50" />
+      <form id="register-form">
+        <div class="form-group row w-50 m-auto">
+          <div class="form-group col-12 col-sm-6">
+            <label>Email</label>
+            <input
+              type="email"
+              class="form-control m-auto"
+              id="email"
+              required
+            />
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <label>Name</label>
+            <input
+              type="text"
+              class="form-control m-auto"
+              id="nombre"
+              required
+            />
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <label>Password</label>
+            <input
+              type="password"
+              class="form-control m-auto"
+              id="password"
+              required
+            />
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <label>Repeat Password</label>
+            <input
+              type="password"
+              class="form-control m-auto"
+              id="repeat-password"
+              required
+            />
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <label>Years of Experience</label>
+            <input
+              type="number"
+              class="form-control m-auto"
+              id="anos_experiencia"
+              required
+            />
+          </div>
+          <div class="form-group col-12 col-sm-6">
+            <label>Specialty</label>
+            <input
+              type="text"
+              class="form-control m-auto"
+              id="especialidad"
+              required
+            />
+          </div>
+          <div class="form-group col-12 col-sm-12">
+            <label>Profile Photo</label>
+            <input type="file" id="foto" required />
+          </div>
+        </div>
+        <button type="submit" class="btn btn-info mb-3">Register</button>
+        <p>Already have an account? <a href="Login.html">Login</a></p>
+      </form>
+    </div>
+
+    <script>
+      document
+        .getElementById("register-form")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const formData = new FormData();
+          formData.append("email", document.getElementById("email").value);
+          formData.append("nombre", document.getElementById("nombre").value);
+          formData.append(
+            "password",
+            document.getElementById("password").value
+          );
+          formData.append(
+            "anos_experiencia",
+            document.getElementById("anos_experiencia").value
+          );
+          formData.append(
+            "especialidad",
+            document.getElementById("especialidad").value
+          );
+          formData.append("foto", document.getElementById("foto").files[0]);
+
+          const response = await fetch("/api/register", {
+            method: "POST",
+            body: formData,
+          });
+
+          if (response.ok) {
+            alert("Registration successful. You can now log in.");
+            window.location.href = "Login.html";
+          } else {
+            alert("Registration failed. Please try again.");
+          }
+        });
+    </script>
+  </body>
+</html>
